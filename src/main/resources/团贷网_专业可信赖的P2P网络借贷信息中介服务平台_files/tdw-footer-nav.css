@@ -1,0 +1,34 @@
+/*footer 底部*/
+.i-tips-arrow1 {display: inline-block; vertical-align: middle; background: url("//js4.tuandai.com/images/v2/icons.png?v=2018102301") no-repeat; }
+.i-tips-arrow1 { bottom: -6px; right: 35px; width: 12px; height: 6px; background-position: -244px -49px; background-position: -257px -49px\9; }
+.tdw-footer-t .col3 strong, .tdw-footer-t .col3 .custombox, .tdw-footer-t .col3 .emailbox{display: inline-block; *display: inline; *zoom: 1;}
+.tdw-footer { width: 100%; margin-top: 40px; padding-top: 75px; padding-bottom: 47px; background: #fff; border-top: 1px solid #eee; }
+.tdw-footer-t { padding-bottom: 47px; height: 133px; font-size: 12px; }
+.tdw-footer-t .col1 dl { float: left; width: 135px; height: 133px; padding-left: 8px; overflow: hidden; }
+.tdw-footer-t .col1 dt { padding-bottom: 21px; color: #333; font-size: 14px; }
+.tdw-footer-t .col1 dd { padding-left: 4px; padding-bottom: 21px; }
+.tdw-footer-t .col1 dd a { color: #999; }
+.tdw-footer-t .col1 dd a:hover { color: #ffb700; }
+.tdw-footer-t .col2 { margin-left: 16px; }
+.tdw-footer-t .app-code, .tdw-footer-t .wechat-code, .tdw-footer-t .service-code { float: left; width: 106px; padding-top: 115px; margin-right: 50px; text-align: center; color: #999; background: url("//js4.tuandai.com/images/v2/supervise.png?v=2018101801") no-repeat; }
+.tdw-footer-t .app-code { background-position: 0px -28px; }
+.tdw-footer-t .wechat-code { background-position: -136px -28px; }
+.tdw-footer-t .service-code { margin-right: 0; background-position: -272px -28px; }
+.tdw-footer-t .col3 { text-align: right; }
+.tdw-footer-t .col3 strong { padding-bottom: 23px; line-height: 24px; font-size: 30px; font-weight: normal; color: #333; }
+.tdw-footer-t .col3 p { padding-bottom: 35px; color: #bbb; }
+.tdw-footer-t .col3 .custombox, .tdw-footer-t .col3 .emailbox { width: 80px; height: 28px; padding-bottom: 0; line-height: 28px; text-align: center; border: 1px solid #ffb700; color: #ffb700; }
+.tdw-footer-t .col3 .custombox:hover .i-foot-customer, .tdw-footer-t .col3 .emailbox:hover .i-foot-customer { background-position: -138px -57px; }
+.tdw-footer-t .col3 .emailbox-wrap { margin-left: 14px; height: 30px; }
+.tdw-footer-t .col3 .emailbox-wrap:hover .email-tips { display: block; }
+.tdw-footer-t .col3 .i-foot-customer { width: 16px; height: 15px; margin-right: 4px; background-position: -138px -39px; }
+.tdw-footer-t .col3 .email-tips { display: none; top: -110px; right: 0; width: 120px; padding: 20px 40px; z-index: 10; background: #fff; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.16); border: 1px solid #eee \9; text-align: left; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; -webkit-animation: fadeInTop 0.2s ease-in; animation: fadeInTop 0.2s ease-in; }
+.tdw-footer-t .col3 .email-tips .text-333 { color: #333; }
+.tdw-footer-t .col3 .email-tips p { padding-bottom: 6px; font-size: 14px; }
+
+/*底部btn*/
+.custombox .btn-text, .emailbox .btn-text { z-index: 2; display: block; position: absolute; left: 0; top: 0; width: 100%; height: 100%; cursor: pointer; -webkit-transition: all 0.3s; -moz-transition: all 0.3s; -ms-transition: all 0.3s; -o-transition: all 0.3s; transition: all 0.3s; }
+.custombox:before, .emailbox:before { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 0%; z-index: 1; background: none; -webkit-transition: all 0.3s; -moz-transition: all 0.3s; -ms-transition: all 0.3s; -o-transition: all 0.3s; transition: all 0.3s; }
+.custombox:hover, .emailbox:hover { -webkit-transition: all 0.5s; -moz-transition: all 0.5s; -ms-transition: all 0.5s; -o-transition: all 0.5s; transition: all 0.5s; *background: #ffb700; }
+.custombox:hover .btn-text, .emailbox:hover .btn-text { color: #fff; }
+.custombox:hover:before, .emailbox:hover:before { background: #ffb700; height: 100%; }

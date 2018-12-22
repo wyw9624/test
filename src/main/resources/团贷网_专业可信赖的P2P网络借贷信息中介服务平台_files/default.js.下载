@@ -1,0 +1,452 @@
+/*
+* date:20180528
+* 首页
+* */
+
+;(function(window,$){
+	return defaultUi ={
+
+		//悬浮导航
+        suspensionNav : function () {
+            $(window).bind('scroll',function(){
+                var scrollTop = $(window).scrollTop(),
+					$nav = $('.tdw-nav');
+                if(scrollTop>525){
+                    $nav.addClass('tdw-nav-suspension');
+                    setTimeout(function(){
+                        $nav.addClass('tdw-nav-suspension-down');
+                    },100)
+                }else if(scrollTop<525){
+                    $nav.removeClass('tdw-nav-suspension');
+                    setTimeout(function(){
+                        $nav.removeClass('tdw-nav-suspension-down');
+                    },100)
+                }
+            });
+        },
+
+		/*会员交易  Tab切换
+		 @param tit  切换标题
+		 @param conbox  切换内容
+		*/
+        tabChange : function(tit,conbox){
+			var index = 0;
+			var atrId = null;
+			//查看更多初始化
+			$(tit).find('li').each(function (i) {
+                if ($(tit).find('li').eq(i).hasClass('active') && $(tit).find('li').eq(i).attr('data-id') == 'wtd') {
+                    $('.tdw-page6 .tdw-page-title').find('a').attr('href', 'http://www.tuandai.com/pages/invest/invest_list?index=2');
+                } else if ($(tit).find('li').eq(i).hasClass('active') && $(tit).find('li').eq(i).attr('data-id') == 'zq') {
+                    $('.tdw-page6 .tdw-page-title').find('a').attr('href', 'http://www.tuandai.com/pages/invest/zqzr_list');
+                }
+			});
+
+			$(tit).find('li').on('mouseover',function(){
+				index = $(this).index();
+				atrId = $(this).attr('data-id');
+				$(tit).find('li').removeClass('active');
+				$(this).addClass('active');
+				$(tit).find('li').find('span').addClass('opacity-60');
+				$(this).find('span').removeClass('opacity-60');
+				$(conbox).find('ul').hide();
+				$(conbox).find('ul').eq(index).show();
+                if (atrId == 'zx') {
+                    $('.tdw-page6 .tdw-page-title').find('a').attr('href', 'http://www.tuandai.com/pages/zSharePlan/zx_invest_list');
+                } else if (atrId == 'zq') {
+                    $('.tdw-page6 .tdw-page-title').find('a').attr('href', 'http://www.tuandai.com/pages/invest/zqzr_list');
+                } else if (atrId == 'xw') {
+                    $('.tdw-page6 .tdw-page-title').find('a').attr('href', 'http://www.tuandai.com/pages/invest/invest_list?index=1');
+                } else if (atrId == 'wtd') {
+                    $('.tdw-page6 .tdw-page-title').find('a').attr('href', 'http://www.tuandai.com/pages/invest/invest_list?index=2');
+                } else if (atrId == 'fqb') {
+                    $('.tdw-page6 .tdw-page-title').find('a').attr('href', 'http://www.tuandai.com/pages/invest/invest_list?index=3');
+                } else if (atrId == 'gyl') {
+                    $('.tdw-page6 .tdw-page-title').find('a').attr('href', 'http://www.tuandai.com/pages/invest/invest_list?index=4');
+                }
+			});
+    	},
+
+        //底部通用活动展示
+		getGeneral : function(){
+        	var $smallAd = $(".general-small-ad");
+			$smallAd.animate({
+				right:"10px"
+			},500);
+			$("#gen-arrow-l").click(function(){
+				$(this).parent(".general-small-ad").animate({
+					right:"-100%"
+				},500);
+				setTimeout(function(){
+					$(".general-big-ad").animate({
+						width:"100%",
+						right:"0px"
+					},500);
+				},500);
+			});
+			$("#general-close").click(function(){
+				$(this).parent(".general-big-ad").animate({
+					right:"-100%"
+				},500);
+				setTimeout(function(){
+					$smallAd.animate({
+						right:"10px"
+					},500);
+				},500);
+			});
+		},
+
+        //关闭左侧banner
+        closeLeftBanner : function(){
+			var LeftBanner = '.left-banner';
+			$(LeftBanner).find('.close').click(function () {
+				$(LeftBanner+'.pic').removeAttr("onclick");
+				$(this).parents(LeftBanner).animate({
+					left: -145
+				});
+			});
+		},
+
+        //窗口大小重置
+		resizeWin : function(){
+			$(window).resize(function () {
+				var $leftBanner = $(".left-banner");
+				if ($("body").outerWidth() >= 1510) {
+					$leftBanner.fadeIn();
+				}
+				else {
+					$leftBanner.fadeOut(300);
+				}
+				$('#slideBox,#slideBox li').css({"width":"100%"});
+			});
+		},
+
+
+		/*WE计划开放 倒计时
+		  @param  timecount  服务器传回倒计时时间 单位：S
+		*/
+		fnTimeCountDown : function(){
+			$(".timeSet").each(function () {
+				var timecount = parseInt($(this).attr("data-count")),
+					formates = publicUi.dateForMate(timecount);   //调用publicUi.js 时间格式化方法
+
+				if (timecount >= 0) {
+					$(this).html(formates);
+					if (timecount == 0) {
+						$(this).parent().html('<span class="btn-text">授权出借</span>');
+					}
+					timecount--;
+					$(this).attr("data-count", timecount);
+				}
+			});
+			setTimeout(defaultUi.fnTimeCountDown, 1000);
+		},
+
+		//左侧工具栏默认显示风险提示
+		showRisk : function(){
+			$('.risk-tips').show();
+			//$('#toolRisk').off('hover');
+			setTimeout(function(){
+				$('.risk-tips').hide();
+			},3000);
+
+			$('#toolRisk').mouseout(function(){
+				$(this).parent().find('.risk-tips').hide();
+			});
+			$('#toolRisk').mouseover(function(){
+				$(this).parent().find('.risk-tips').show();
+			});
+		},
+
+		//底部右侧广告位的点击量统计
+        lowerRightAdCount : function (tdDefaultHtmlOpt,clickSign) {
+		    var userName = tdDefaultHtmlOpt.userName,
+                now = new Date(),
+                clickDate,clickLoc;
+            if (typeof (nwbi_api) != 'undefined') {
+                clickDate = now.getFullYear()+"-"+(now.getMonth()+1)+"-"+now.getDate()+" "+(now.getHours()<10?"0"+now.getHours():now.getHours())+":"+(now.getMinutes()<10?("0"+now.getMinutes()):now.getMinutes())+":"+now.getSeconds();
+                clickLoc = clickSign==1?"收起位置":"展开位置";
+                nwbi_api.nwbi_logWebEvent(
+                    userName,//团贷网用户名
+                    clickDate,//时间
+                    "首页底部广告",//事件类别
+                    "点击广告",    //事件标签
+                    clickLoc, //事件值
+                    1,  //事件达成状态，1：成功；0：失败
+                    "", // 失败原因类型
+                    "", //失败原因
+                    "TDW"); //入口站点
+            }
+        },
+        //京东E卡弹窗
+        jdFn : function () {
+            var browserV = Math.floor($.browser.version);
+            //关闭右边图片
+            $('.left-banner-jd').find('.close').click(function () {
+                $(".left-banner .pic").removeAttr("onclick");
+                $(this).parents('.left-banner-jd').hide();
+            });
+            var mgB = -$('.jd-win').height() / 2;
+            //打开，关闭窗口
+            $('.left-banner-jd').find('a').click(function () {
+                if ($.browser.msie && browserV < 10) {
+                    $(".jd-win").css({
+                        "margin-left": "-324px",
+                        "margin-bottom": mgB,
+                        "bottom": "50%",
+                        "left": "50%"
+                    })
+                } else {
+                    $('.jd-win').removeClass('jd-win2');
+                    $('.jd-win').addClass('jd-win1');
+                }
+
+                $('.jd-win').show();
+                $('#diallayer').show();
+                return false;
+            });
+            $('.jd-win-close, .jd-btn').click(function () {
+                $('.jd-win').removeClass('jd-win1');
+                $('.jd-win').addClass('jd-win2');
+                if ($.browser.msie && browserV < 10) {
+                    $('.jd-win').hide();
+
+                } else {
+                    setTimeout(function () {
+                        $('.jd-win').hide();
+                    }, 600);
+                }
+                $('#diallayer').hide();
+            })
+
+        },
+        /**
+         * we自动服务标的滑过交互
+         * */
+        weObjectHover : function(){
+            $('.tdw-auto-list li').on('mouseover',function(){
+                $(this).prev('li').find('a').addClass('border-rt-tranp');
+            });
+            $('.tdw-auto-list li').on('mouseout',function(){
+                $(this).prev('li').find('a').removeClass('border-rt-tranp');
+            });
+        }
+
+
+
+	}
+
+})(window,jQuery);
+
+
+;(function(window,$){
+
+    return defaultLogic = {
+
+        //获取轮播图
+        getBanner : function(){
+            $.common.asyncPost('/home/getBanner', function (data) {
+                var html = '', li = '',$slide = $("#slideBox");
+                for(var i = 0; i < data.length; i++) {
+                    var obj = data[i];
+                    html += '<li data-opacity="0.1" style="background:url('+obj.picUrl+') 50% 50% no-repeat; ">' +
+                        '<a href="'+obj.url+'" target="_blank">'+obj.title+'</a>' +
+                        '</li>';
+                    li += '<li class=""></li>';
+                }
+                $("#thumb-li").html(li);
+                $slide.html(html);
+                //banner SuperSlide 调用
+                jQuery(".tdw-banner").slide({ mainCell: ".bd ul", effect: "fold", autoPlay: true, interTime: 5000, delayTime: 1000 });
+                $slide.css({"width":"100%"});
+                $slide.find("li").css("width","100%");
+            }, function (err) {
+                console.error(err);
+            });
+        },
+
+        //新手限额浮框
+        newHandQuota : function (ele) {
+            var popOnFlag = true,
+                $newhadPop =  $('.newhand-pop');
+
+            //浮框自适应
+            if($('.general-small-ad').length >0 || $('.general-big-ad').length>0){
+                $newhadPop.css({'bottom':'193px'});
+            }else{
+                $newhadPop.css({'bottom':'33px'});
+            }
+
+            //关闭悬浮球弹窗
+            $newhadPop.on('click','.newhand-close',function () {
+                $(this).parents('.newhand-pop').hide();
+            });
+
+            //滑过请求数据
+            $(ele).on('mouseenter',function () {
+                if(popOnFlag){
+                    popOnFlag = false;
+                    $.ajax({
+                        async: false,
+                        url: "/home/getNewHandInfo",
+                        dataType: "json",
+                        type: 'post',
+                        success: function (json) {
+                            if(json.code == 0){
+                                var html = json.data.maxAmount + "<span>元</span>";
+                                $(".newhand-quota").html(html);
+                                $(".newhand-num").text(json.data.buyNewHandNum + '次');
+                            }else{
+                                popOnFlag = true;
+                            }
+                        }
+                    });
+                }
+            });
+            $(ele).on('mouseleave',function () {
+                popOnFlag = true;
+            });
+
+            $.common.asyncPost('/home/showNewHandDialog', function (data) {
+                $(".newhand-pop").show();
+            }, function (data) {
+                $(".newhand-pop").hide();
+            });
+        },
+
+        // 获取智享列表加息标签
+        getZshareTitle : function () {
+            var _this = this,
+                ids = $("#zShareIds").val();
+            $.common.asyncPost('/home/getZshareTitle',{ids: ids}, function (data) {
+                var item,obj;
+                if(data){
+                    for(var i = 0; i < data.length; i++){
+                        item = data[i];
+                        obj = $('.zshare-rate[data-name="'+item.projectId+'"]');
+                        if(item.autoAddRate > 0){
+                            obj.find('.automation-tag').css("display", "inline-block");
+                            obj.find('.automation-tag').html("自动工具加息" + item.autoAddRateStr + "%");
+                        }
+                        if(item.handAddRate > 0){
+                            obj.find('.hand-movement-tag').css("display", "inline-block");
+                            obj.find('.hand-movement-tag').html("手动承接加息" + item.handAddRateStr + "%");
+                            obj.find('.auto-rate').html("+" + item.handAddRateStr + "%");
+                        }
+                    }
+                    //显示自动投标弹窗
+                   // _this.showZshareDialog();
+
+                }
+            }, function (err) {
+                $('.zshare-rate').on('click',function(){
+                    var dataName = $(this).attr('data-name');
+                    $(this).attr('href','//www.tuandai.com/pages/invest/zx_detail?id='+dataName).attr('target','_blank');
+                });
+            });
+        },
+
+        //显示智享自动投标弹窗
+        showZshareDialog : function(){
+            var zxHtml = publicUi.autoInvestHtml();
+            $('.zshare-rate').on('click',function(){
+                var dataName = $(this).attr('data-name'),
+                    thisAutoDisplay = $(this).find('.automation-tag').css('display'),
+                    thisHandDisplay = $(this).find('.hand-movement-tag').css('display');
+                if(thisAutoDisplay==='inline-block' && thisHandDisplay==='none' || thisAutoDisplay==='inline-block' && thisHandDisplay==='inline-block' ){
+                    publicUi.tdPopAlert({
+                        className:'open-zx-alert',
+                        id:'openZxPopAlert',
+                        type:'dialog',
+                        title:'开启自动投标',
+                        contents:zxHtml,
+                        TextAlign:'center',
+                        width:480,
+                        height:472,
+                        zindex:9999,
+                        btnWidth:228,
+                        btnHeight:38,
+                        okBtn:'不必了，直接手动承接',
+                        okCallback: function(){
+                            window.open('//www.tuandai.com/pages/invest/zx_detail?id='+dataName);
+                            $('#openZxPopAlert').remove().hide();
+                            $('.td-mask').remove().hide();
+                        }
+                    });
+                }
+                if(thisHandDisplay==='inline-block' && thisAutoDisplay==='none' || thisHandDisplay==='none' && thisAutoDisplay==='none'){
+                    $(this).attr('href','//www.tuandai.com/pages/invest/zx_detail?id='+dataName).attr('target','_blank');
+                }
+
+            });
+        },
+        //开启WE+ WE计划自动投标弹窗
+        showWePlanDialog : function () {
+            $('.weOpenBtn').on('click',function () {
+                var href = $(this).attr('data-href'),
+                    autoTag = $(this).find('.automation-tag').length,
+                    handTag = $(this).find('.hand-movement-tag').length,
+                    zxHtml = publicUi.autoInvestHtml();
+                if(autoTag > 0 && handTag <= 0 ||  autoTag > 0 && handTag > 0){
+                    publicUi.tdPopAlert({
+                        className:'open-zx-alert',
+                        id:'openWeplanPopAlert',
+                        type:'dialog',
+                        title:'开启自动投标',
+                        contents:zxHtml,
+                        TextAlign:'center',
+                        width:480,
+                        height:472,
+                        zindex:9999,
+                        btnWidth:228,
+                        btnHeight:38,
+                        okBtn:'不必了，直接手动出借',
+                        okCallback: function(){
+                            window.open(href);
+                            $('#openWeplanPopAlert').remove().hide();
+                            $('.td-mask').remove().hide();
+                        }
+                    });
+                }
+                if(autoTag <= 0 && handTag <= 0 || autoTag <= 0 && handTag > 0 ){
+                    $(this).find('a').attr('href',href).attr('target','_blank');
+                }
+            });
+        },
+        /**
+         * 获取返现利率
+         * */
+        getCashBackRate :function(tdDefaultHtmlOpt){
+            var _this= this,
+                ftpList = tdDefaultHtmlOpt.ftpList,        //we+自动服务
+                wePlanList = tdDefaultHtmlOpt.wePlanList,  //we自动服务
+                weProducts = tdDefaultHtmlOpt.weProducts;  //新手专享服务
+            $.each(ftpList,function(i,item){
+                _this.getCashBackRateHandle(item.wePubCach, ".ftb-cashback-"+i);
+            });
+            $.each(wePlanList,function(i,item){
+                _this.getCashBackRateHandle(item.wePubCach, ".weplan-cashback-"+i);
+            });
+            $.each(weProducts,function(i,item){
+                _this.getCashBackRateHandle(item.wePubCach, ".new-cashback-"+i);
+            });
+        },
+        /**
+         * 根据返现利率获取对应数字图标
+         * @param  wePubCach  返现利率
+         * @param  rateClass  自动服务标的标识
+         * */
+        getCashBackRateHandle :function(wePubCach, rateClass){
+            if(wePubCach != "" && wePubCach != null && wePubCach != "undefined" && parseFloat(wePubCach) >0){
+                var dataArr = wePubCach.split('.');
+                for(var j=0,len = dataArr.length; j < len; j++){
+                    $(rateClass ).show();
+                    $(rateClass + ' .cashback-rate'+j).addClass('cashback'+ dataArr[j]);
+                }
+            }else{
+                $(rateClass).hide();
+            }
+
+        }
+    }
+})(window,jQuery);
+

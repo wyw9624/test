@@ -1,0 +1,396 @@
+﻿/**
+ * TuanDai
+ * @version v3.00
+ * @author  allen
+ * @time 2015-12-23 20:10
+ */
+/*
+上线时使用如下:
+var portalWebsiteUrl = "//www.tuandai.com";
+var imageWebsiteUrl = "//image.tuandai.com";
+var niwoWebsiteUrl = "http://www.niiwoo.com";
+var ActivityWebsiteUrl = "//hd.tuandai.com";
+var portalWebsiteUrl = "//www.td.com";
+var imageWebsiteUrl = "//image.td.com";
+var niwoWebsiteUrl = "http://www.niwo.com";
+var ActivityWebsiteUrl = "//hd.td.com";
+*/
+var portalWebsiteUrl = "//www.tuandai.com",
+    imageWebsiteUrl = "//image.tuandai.com",
+    niwoWebsiteUrl = "http://www.niwo.com",
+    ActivityWebsiteUrl = "//hd.tuandai.com",
+    DQWebsiteUrl = "//dq.tdw.cn",
+    PassportWebUrl = "//passport.tuandai.com",
+    contractViewUrl = "//contract.tuandai.com";
+
+var tdObj = new Object();
+tdObj.key = '#@zstuandaijjmzfc!#';
+// 登录注册方法
+;
+(function (window, $) {
+    return publicLogin = {
+        getUrlParam: function (name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"),
+                r = window.location.search.substr(1).match(reg);
+            if (r != null) return unescape(r[2]);
+            return null;
+        },
+        //登录
+        login: function () {
+            var returnUrl = this.getUrlParam("ReturnUrl");
+            if (returnUrl == null || returnUrl == "") {
+                returnUrl = document.URL;
+                if (returnUrl.toLowerCase().indexOf("/user/") > -1 || returnUrl.toLowerCase().indexOf("/user/ResetPwd_Telno.aspx") > -1) {
+                    return location.href = portalWebsiteUrl + "/u/login", !1
+                }
+            }
+            return location.href =  PassportWebUrl + "/2login?ret=" + encodeURIComponent(returnUrl), !1
+        },
+        //跳到注册
+        register: function () {
+            return location.href = PassportWebUrl + "/2register", !1
+        },
+        //退出
+        logout: function () {
+            var _this = this,
+                url = portalWebsiteUrl + "/home/clearUserCookie";
+            if ("https:" == document.location.protocol)
+                url = url.replace("http://", "https://");
+            $.ajax({
+                dataType: "jsonp",
+                url: url,
+                success: function () {
+                    var returnUrl = _this.getUrlParam("ReturnUrl");
+                    if (returnUrl == null || returnUrl == "") {
+                        returnUrl = document.URL;
+                        if (returnUrl.toLowerCase().indexOf("/user/") > -1 || returnUrl.toLowerCase().indexOf("/user/ResetPwd_Telno.aspx") > -1) {
+                            return location.href = portalWebsiteUrl + "/u/logout";
+                        }
+                    }
+                    return location.href = portalWebsiteUrl + "/u/logout?ReturnUrl=" + returnUrl;
+                },
+                cache: false
+            });
+        }
+    }
+})(window, jQuery)
+
+;
+(function (window, $) {
+    return Public = {
+        //验证浮点数(非负)
+        checkFloat: function (obj) { //是非负浮点数返回：true,不是返回：false
+            var reg = RegExp("^\\d+(\\.\\d+)?$");
+            return reg.test(obj);
+        },
+        //金额格式化并保留指定的小数位(四舍五入)
+        // @param s  
+        // @param n        
+        fmoney: function (s, n) {
+            var n = n > 0 && n <= 20 ? n : 2,
+                s = parseFloat((s + "").replace(/[^\d\.-]/g, "")).toFixed(n) + "",
+                l = s.split(".")[0].split("").reverse(),
+                r = s.split(".")[1],
+                t = "";
+            for (var i = 0; i < l.length; i++) {
+                t += l[i] + ((i + 1) % 3 == 0 && (i + 1) != l.length ? "," : "");
+            }
+            return t.split("").reverse().join("") + "." + r;
+        },
+        /**
+         * 金额格式化保留两位小数（当只有一位小数自动补0）
+         * @param  amount
+         * */
+        GetMoney: function (amount) {
+            if (amount.toString().indexOf('.') > -1) {
+                var len = amount.substr(amount.toString().indexOf('.')).length;
+                if (len == 2) {
+                    return amount + "0";
+                } else {
+                    return amount;
+                }
+            } else {
+                return amount + ".00";
+            }
+        },
+
+        getStrAmount : function(amount){
+            var strAmount;
+            if(amount < 10000){
+                strAmount = amount + "元";
+            }else if(amount < 100000000){
+                strAmount = parseFloat(amount)/10000 + "万"
+            }else{
+                strAmount = parseFloat(amount)/100000000 + "亿";
+            }
+            return strAmount;
+        },
+
+        //标的详情页充值按钮
+        checkRecharge: function () {
+            if (cgtCommon.checkIsOpen("")) {
+                $(".recharge-flag").attr("href", "http://www.tuandai.com/member/Bank/Recharge");
+                $(".recharge-flag")[0].click();
+            }
+        },
+        HexTostring: function (s) {
+            var r = '';
+            for (var i = 0; i < s.length; i += 2) {
+                var sxx = parseInt(s.substring(i, i + 2), 16);
+                r += String.fromCharCode(sxx)
+            }
+            return r
+        },
+        stringToHex: function (s) {
+            var r = '',
+                hexes = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
+            for (var i = 0; i < (s.length); i++) {
+                r += hexes[s.charCodeAt(i) >> 4] + hexes[s.charCodeAt(i) & 0xf]
+            }
+            return r
+        },
+        //判断对象是否为空  空：true
+        isEmptyObject : function (obj) {
+            for (var key in obj) {
+                return false;
+            }
+            return true;
+        },
+        /*js加密*/
+        fnStringJM2: function (s) {
+            return des(tdObj.key, this.HexTostring(s), 0, 0);
+        },
+
+        fnStringJM: function (s) {
+            return this.stringToHex(des(tdObj.key, s, 1, 0));
+        },
+
+        checkPartner: function () {
+            if (cgtCommon.checkIsOpen("")) {
+                $(".partner-flag").attr("href", "http://www.tuandai.com/member/PartnerPromotion/Account_PartnerPromotionMoneyHistroy");
+                $(".partner-flag")[0].click();
+            }
+        },
+        //限制只能输入数字(不可以含有小数)
+        limitInt: function (fn) {
+            jQuery(fn).keydown(function (e) {
+                // 注意此处不要用keypress方法，否则不能禁用　Ctrl+V 与　Ctrl+V,具体原因请自行查找keyPress与keyDown区分，十分重要，请细查
+                if (((e.keyCode > 47) && (e.keyCode < 58)) || (e.keyCode == 9) || (e.keyCode == 8) || ((e.keyCode >= 96) && (e.keyCode <= 105)) || (e.keyCode == 110)) { // 判断键值
+                    return true;
+                } else {
+                    return false;
+                }
+
+            }).focus(function () {
+                this.style.imeMode = 'disabled'; // 禁用输入法,禁止输入中文字符
+            });
+        },
+        converNumUtil: function (number) {
+            var t = number ? (typeof number === 'number' ? number : parseFloat(number)).toFixed(3) : '';
+            return t ? t.substr(0, t.length - 1) : '0';
+        },
+        //写cookies
+        setCookie: function (name, value) {
+            var Days = 30,
+                exp = new Date();
+            exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
+            document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString();
+        },
+        //读取cookies
+        getCookie: function (name) {
+            var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+
+            if (arr = document.cookie.match(reg))
+
+                return unescape(arr[2]);
+            else
+                return null;
+        },
+
+        //删除cookies
+        delCookie: function (name) {
+            var exp = new Date();
+            exp.setTime(exp.getTime() - 1);
+            var cval = getCookie(name);
+            if (cval != null)
+                document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
+        },
+
+        getCookieValue: function (name) {
+            var acookie = document.cookie.split("; ");
+            for (var i = 0; i < acookie.length; i++) {
+                if (acookie[i].indexOf('=') > -1) {
+                    var arr = acookie[i].split("=");
+                    if (name == arr[0]) {
+                        return decodeURI(arr[1]);
+                    }
+                }
+            }
+            return "";
+        },
+
+        /*登录方法*/
+        initLogin: function () {
+            var getVersion = $('.tdw-top').attr('version');
+            if(!(getVersion === 'interface-data')){
+                this.GetLocalLoginStatus();
+            }
+
+        },
+        GetLocalLoginStatus: function () {
+            var url = portalWebsiteUrl + "/user/services/AccountNewHandler.ashx";
+            if ("https:" == document.location.protocol)
+                url = url.replace("http://", "https://");
+            $.ajax({
+                url: url,
+                dataType: "jsonp",
+                scriptCharset: "gb2312",
+                success: function (data) {
+                    $("#topinfo").html(data.topinfo);
+                    $("#myAccount").html(data.accountinfo);
+                    $("#myAccountDefault").html(data.accountinfo);
+                    $("#myTransfer").html(data.zxInfo);
+                    if (data && data.sso) {
+                        $.each(data.sso, function (i, val) {
+                            $.ajax({
+                                url: this,
+                                type: "GET",
+                                dataType: "text",
+                                success: function (data) {
+                                    jQuery.ajax({
+                                        url: data,
+                                        dataType: "jsonp"
+                                    });
+                                }
+                            });
+                        });
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    //  alert(textStatus);
+                }
+            });
+        },
+        //判断cookie是否有登录凭证
+        isCookieLogin: function () {
+            var cookieValue = jaaulde.utils.cookies.get("tuandaiw");
+            if (cookieValue != "" && cookieValue != null)
+                return true;
+            else
+                return false;
+        },
+        getName: function () {
+            var nwbi_userName = "",
+                nwbi_sysNo = "TDW",
+                IsLogin = this.isCookieLogin();
+            if (IsLogin) {
+                var nickname = jaaulde.utils.cookies.get("TDWUserName");
+                nwbi_userName = nickname;
+            }
+        },
+        getClientInf: function () {
+            var ta = document.createElement('script');
+            ta.type = 'text/javascript';
+            ta.async = true;
+            ta.src = ((("https:") == document.location.protocol) ? "https://" : "http://") +
+                'bilog.niiwoo.com/js/webaccess.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ta, s);
+        },
+        baiduStatistics: function () {
+            var hm = document.createElement("script"),
+                s = document.getElementsByTagName("script")[0];
+            hm.src = "//hm.baidu.com/hm.js?6dff67da4e4ef03cccffced8222419de";
+            s.parentNode.insertBefore(hm, s);
+        },
+        /**
+         * 全局设置ajax
+         * */
+        ajaxSetupFn :function(){
+            //这里给所有ajax请求添加一个complete函数
+            $.ajaxSetup({
+                complete : function(xhr, status) {
+                    //拦截器实现超时跳转到登录页面
+                    // 通过xhr取得响应头
+                    var REDIRECT = xhr.getResponseHeader("REDIRECT");
+                    //如果响应头中包含 REDIRECT 则说明是拦截器返回的
+                    if (REDIRECT == "REDIRECT")
+                    {
+                        var win = window;
+                        while (win != win.top)
+                        {
+                            win = win.top;
+                        }
+                        //重新跳转到 login.html
+                        win.location.href = xhr.getResponseHeader("CONTEXTPATH");
+                    }
+                }
+            });
+        }
+
+    }
+})(window, jQuery);
+
+
+
+
+//兼容toFixed方法
+Number.prototype.toFixed = function (n) {
+    if (n > 20 || n < 0) {
+        throw new RangeError('toFixed() digits argument must be between 0 and 20');
+    }
+    var number = this;
+    if (isNaN(number) || number >= Math.pow(10, 21)) {
+        return number.toString();
+    }
+    if (typeof (n) == 'undefined' || n == 0) {
+        return (Math.round(number)).toString();
+    }
+    var result = number.toString();
+    var arr = result.split('.');
+    if (arr.length < 2) {
+        result += '.';
+        for (var i = 0; i < n; i += 1) {
+            result += '0';
+        }
+        return result;
+    }
+    var integer = arr[0];
+    var decimal = arr[1];
+    if (decimal.length == n) {
+        return result;
+    }
+    if (decimal.length < n) {
+        for (var i$__0 = 0; i$__0 < n - decimal.length; i$__0 += 1) {
+            result += '0';
+        }
+        return result;
+    }
+    result = integer + '.' + decimal.substr(0, n);
+    var last = decimal.substr(n, 1);
+    if (parseInt(last, 10) >= 5) {
+        var x = Math.pow(10, n);
+        result = (Math.round((parseFloat(result) * x)) + 1) / x;
+        result = result.toFixed(n);
+    }
+    return result;
+};
+
+
+
+$(function () {
+    //清除IE浏览器下ajax缓存
+    $.ajaxSetup({
+        cache: false
+    });
+    // 初始化登录状态
+    Public.initLogin();
+    //   百度统计
+    Public.baiduStatistics();
+    //   获取用户名
+    Public.getName();
+    //   获取用户客户端信息
+    Public.getClientInf();
+    //全局设置ajax
+    Public.ajaxSetupFn();
+});

@@ -1,0 +1,558 @@
+;
+(function (window, $) {
+    return publicUi = {
+        //显示右侧工具栏
+        showRightSlider: function (params) {
+            var _this = this;
+            $(window).bind('scroll', function () {
+                var scrollTop = $(window).scrollTop();
+                if (scrollTop > 500) {
+                    $('.tool-backtop').fadeIn(300);
+                } else {
+                    $('.tool-backtop').fadeOut(300);
+                }
+            });
+            $('#toolRisk').hover(function () {
+                $(this).parent().find('.risk-tips').stop().fadeIn();
+            }, function () {
+                $(this).parent().find('.risk-tips').stop().fadeOut();
+            });
+            //显示返回顶部
+            _this.toTop();
+        },
+        //显示返回顶部
+        toTop: function () {
+            $('#tool-backtop').on('click', function () {
+                $('html,body').stop().animate({
+                    scrollTop: 0
+                }, 500);
+            });
+        },
+        //友情链接展开
+        friendLinks: function () {
+            $('.tdw-footer-links .hide-btn').on('click', function () {
+                var autoHeight = $(this).parents('.tdw-footer-links').find('ul').css('height', 'auto').height();
+                if ($(this).find('i').hasClass('i-arrow-up1')) {
+                    $(this).html('隐藏<i class="tdw-icons i-arrow-down1"></i>');
+                    $(this).parents('.tdw-footer-links').animate({
+                        height: autoHeight
+                    });
+                } else {
+                    $(this).html('展开<i class="tdw-icons i-arrow-up1"></i>');
+                    $(this).parents('.tdw-footer-links').animate({
+                        height: '20px'
+                    });
+                }
+            });
+        },
+
+        /**
+         * 贷后追踪显示效果
+         * 调用方法publicUi.postLoan('.daihou-list-new')
+         */
+
+        postLoan: function (ele) {
+            var _isShow = true;
+            $(ele).find('li:eq(7)').addClass('last-li');
+            $(ele).on('click', '.dh-morebtn', function () {
+                if (_isShow) {
+                    $(ele).find('li').removeClass('last-li');
+                    $(ele).find('li:last').addClass('last-li');
+                    $(ele).find('li.dh-hide').show();
+                    $(this).hide();
+                }
+                publicUi.scrollPos('.bid_invest_nav','.panel');  //初始化详情页滚动元素位置
+            });
+        },
+        /**
+         * 调用方法 publicUi.scrollPos('.bid_invest_nav','.panel');
+         * */
+        topArr :[],
+        scrollPos : function (ele,panel) {
+            var _this = this,
+                sTop = $(window).scrollTop();
+            _this.topArr = [];
+            $(panel).each(function (i) {
+                if(i===0){
+                    _this.topArr.push($(panel).eq(0).offset().top-$(ele).height()-5);
+                }else{
+                    if(!($(ele).css('position') === 'fixed')){
+                        _this.topArr.push($(this).offset().top - $(ele).height()*2);
+                    }else{
+                        _this.topArr.push($(this).offset().top - $(ele).height());
+                    }
+                }
+            });
+            for(var i=0,len=_this.topArr.length; i<len; i++){
+                (function (i,len) {
+                    if(sTop >= _this.topArr[i] && sTop < _this.topArr[i+1] || i >= len-1 && sTop >= _this.topArr[i]){
+                        $(ele).find('li').eq(i).addClass('selected').siblings('li').removeClass('selected');
+                    }
+                })(i,len);
+            }
+
+        },
+        /**
+         * 菜单固定在屏幕顶部
+         * 调用方法 publicUi.navFixedTop('.bid_invest_nav');
+         * */
+        navFixedTop : function(ele){
+            var _this = this,
+                sTop = $(window).scrollTop(),
+                tabNav = $(ele).offset().top,
+                topArr = [];
+
+            if(sTop >= tabNav){
+                $(ele).css({'position':'fixed','top':'0px','left':'0px'});
+            }else{
+                $(ele).css({'position':'relative','top':'0px','left':'0px'});
+            }
+            $(window).bind('scroll', function () {
+                var sTop = $(window).scrollTop();
+                if(sTop >= tabNav){
+                    $(ele).css({'position':'fixed','top':'0px','left':'0px'});
+
+                }else{
+                    $(ele).css({'position':'relative','top':'0px','left':'0px'});
+                }
+                for(var i=0,len=_this.topArr.length; i<len; i++){
+                    (function (i,len) {
+                        if(sTop >= _this.topArr[i] && sTop < _this.topArr[i+1] || i >= len-1 && sTop >= _this.topArr[i]){
+                            $(ele).find('li').eq(i).addClass('selected').siblings('li').removeClass('selected');
+                        }
+                    })(i,len);
+                }
+
+            });
+
+            $(ele).find('li').on('click',function(){
+                var index = $(this).index(),
+                    $this = $(this);
+                $('html,body').stop().animate({
+                    scrollTop : _this.topArr[index]+'px'
+                },250);
+                setTimeout(function () {
+                    $this.addClass('selected').siblings('li').removeClass('selected');
+                },250);
+
+
+            });
+        },
+
+        //未登录 隐藏我的账户下拉菜单
+        subMenuShow: function () {
+            if ($('.tdw-nav .my-account').length == 0) {
+                $('.my-account-default').next('.sonmenu').css({
+                    'display': 'none'
+                });
+            }
+        },
+        // 年化利率风险提示
+        showtips: function () {
+            $('.showtips-box').hover(function () {
+                $(this).find('.lv-showtips-prom').show();
+            }, function () {
+                $(this).find('.lv-showtips-prom').hide();
+            })
+        },
+
+        //身份证示例图显示
+        showCodexe: function () {
+            $(".a_code").mouseover(function () {
+                $(".codexe").show();
+            }).mouseout(function () {
+                $(".codexe").hide();
+            });
+        },
+        colosenewWindow: function () {
+            $("#dial-window").hide();
+            $("#diallayer").hide();
+            //点关闭时刷新当前页面 allen 2016-03-16
+            var isRefresh = $("#dial-window").find(".close").attr("isrefresh");
+            if (isRefresh == "1") {
+                window.location.reload();
+            }
+        },
+
+        //弹出弹框
+        showDialWindowsWithoutBtn: function (title, content) {
+            this.showDialWindows(title + "<i class=\"close icons close-x icon abs\" onclick=\"publicUi.colosenewWindow()\"></i>", content, null, null, null, null);
+        },
+        ///弹框,title:弹框标题
+        ///content：弹框内容
+        /// okString ok按钮内容, okbtnEvent ok按钮触发事件, cancleString取消按钮内容, cancleEvent取消按钮触发事件
+
+        showDialWindows: function (title, content, okString, okbtnEvent, cancleString, cancleEvent) {
+            if ($("#divTiQian").length > 0)
+                $("#divTiQian").html('').hide();
+            if (title.indexOf("close icons") < 0)
+                title += "<i class=\"close icons close-x icon abs\" onclick=\"publicUi.colosenewWindow()\"></i>";
+            $("#dial-window .title").html(title);
+            $("#dial-window .body").html(content);
+            if (okString != "null" && okString != null && okString.length > 0) {
+                $("#dial-window-okbtn").html(okString);
+                $("#dial-window-okbtn").show();
+            } else {
+                $("#dial-window-okbtn").hide();
+            }
+
+            $("#dial-window-okbtn").unbind("click").bind("click", function (e) {
+                e.preventDefault();
+                if (okbtnEvent) {
+                    okbtnEvent();
+                }
+            });
+
+            if (cancleString != "null" && cancleString != null && cancleString.length > 0) {
+                $("#dial-window-canclebtn").html(cancleString);
+                $("#dial-window-canclebtn").show();
+            } else {
+                $("#dial-window-canclebtn").hide();
+            }
+            $("#dial-window-canclebtn").unbind("click").bind("click", function (e) {
+                e.preventDefault();
+                if (cancleEvent) {
+                    cancleEvent();
+                }
+            });
+            $("#diallayer").show();
+            $("#dial-window-btns").show();
+            $("#dial-window").show();
+        },
+
+        ///关闭弹框
+        closeLoadingWindows: function () {
+            $("#dial-window .title").html("");
+            $("#dial-window .body").html("");
+            $("#dial-window-btns").hide();
+            $("#layer").hide();
+            $("#diallayer").hide();
+            $("#dial-window").hide();
+            if ($("#divTiQian").length > 0) {
+                $("#divTiQian").hide();
+            }
+        },
+
+        //当分、秒小于10 自动补0
+        addZero : function (n) {
+            var n = parseInt(n, 10);
+            if (n > 0) {
+                if (n <= 9) {
+                    n = "0" + n;
+                }
+                return String(n);
+            } else {
+                return "00";
+            }
+        },
+
+        /* 时间格式化
+         @param  tcount  单位：S
+         */
+        dateForMate : function (tcount) {
+            var formateObj = {
+                sec : '00',
+                mini:'00',
+                hour:'00',
+                day:'00'
+            };
+            formateObj.sec = this.addZero(tcount % 60);
+            formateObj.mini = Math.floor((tcount / 60)) > 0 ? this.addZero(Math.floor((tcount / 60)) % 60) : "00";
+            formateObj.hour = Math.floor((tcount / 3600)) > 0 ? parseInt(tcount / 3600) % 24 : "00";
+            formateObj.day = Math.floor((tcount / 86400)) > 0 ? parseInt(Math.floor((tcount / 86400))) : "0";
+            return "<span>"+formateObj.day+"</span>天<span>" + formateObj.hour + "</span>时<span>" + formateObj.mini + "</span>分<span'>" + formateObj.sec + "</span>秒";
+
+        },
+
+        /**
+         * 弹窗自写插件
+         * @param   opt  弹窗参数配置
+         * 调用方法  publicUi.tdPopAlert({
+                        id:'popAlert1',
+                        type:'dialog',
+                        title:'团贷网提醒您：',
+                        contents:'<p>文本</p>',
+                        TextAlign:'center',
+                        width:450,
+                        height:190,
+                        zindex:9999,
+                        btnWidth:160,
+                        btnHeight:40,
+                        okBtn:'确定',
+                        okCallback: function(){
+                            window.open('http://www.tuandai.com');
+                        },
+                        cancelBtn: '取消'
+                    });
+         * */
+        tdPopAlert : function(opt){
+
+            //默认参数配置
+            var defaults = {
+                className:'',                         //弹窗样式名（可自定义样式）
+                id: 'popAlert',                       //弹窗Id
+                title: '温馨提示：',                   //标题
+                type:'dialog',                        //弹窗类型  *dialog 带关闭按钮弹窗  *toast 提示弹窗3S后自动消失
+                contents: '',                         //内容
+                TextAlign:'center',                   //文字对齐方式
+                width:480,                            //弹窗宽度
+                height:'',                            //弹窗高度
+                zindex:9999,                          //显示层级
+                btnWidth:118,                          //按钮宽度
+                btnHeight:38,                         //按钮高度
+                okBtn: '',                            //确定按钮
+                okCallback: '',                       //确定按钮回调函数
+                cancelBtn: '',                        //取消按钮
+                cancelCallback: '',                   //取消按钮回调函数
+                closeCallback:'',                     //关闭按钮回调函数
+                textBtn:''                            //确定（支持一个确定按钮）
+
+            };
+
+            //参数合并
+            var option = $.extend({},defaults,opt);
+
+            var dialog = {};
+
+            var aHtml = [], mesHtml = [];
+            aHtml.push('<div class="td-mask"></div>'
+                +'<div class="tdPopAlert '+ option.className +'" id="'+ option.id +'" style="width: '+ option.width +'px; height: '+ option.height +'px;">'
+                +'<i class="closed"></i>'+'<div class="title">'+ option.title +'</div>'
+                +'<div class="contents">'+ option.contents +'</div><div class="btn-group">'
+                +'</div></div>');
+            mesHtml.push('<div class="td-maskMes"></div>'
+                +'<div class="tdPopMessage" id="'+ option.id +'" style="width: '+ option.width +'px; height: '+ option.height +'px;">'
+                +'<div class="contents">'+ option.contents
+                +'</div></div>');
+            if(option.type==='dialog'){
+                $('body').append(aHtml.join(''));
+            }else if(option.type==='toast'){
+                $('body').append(mesHtml.join(''));
+            }
+
+            var $container = $('.tdPopAlert'),
+                $containerMes = $('.tdPopMessage'),
+                $mask = $('.td-mask'),
+                $maskmes = $('.td-maskMes'),
+                $contents = $('.contents'),
+                $btngroup = $('.tdPopAlert .btn-group'),
+                $closeBtn = $('.tdPopAlert .closed');
+
+            dialog.init = function(){
+                dialog.framework();
+                dialog.closeSetTimeOut();
+
+            };
+
+            dialog.framework = function(){
+                var styleVal = '';
+
+                if(option.btnWidth){
+                    styleVal += 'width:'+option.btnWidth+'px; ';
+                }else{
+                    styleVal += '';
+                }
+                if(option.btnHeight){
+                    styleVal += 'height:'+option.btnHeight+'px; '+'line-height:'+option.btnHeight+'px';
+                }else{
+                    styleVal +='';
+                }
+                if(option.okBtn){
+                    $btngroup.append('<a class="ok-btn" style="'+styleVal+'" href="javascript:;">'+ option.okBtn +'</a>');
+                    $btngroup.delegate('.ok-btn','click',function(){
+                        if(option.okCallback){
+                            option.okCallback();
+                        }else{
+                            dialog.closeAlert();
+                        }
+                    });
+
+                }
+                if(option.cancelBtn){
+                    $btngroup.append('<a class="cancel-btn" style="'+styleVal+'" href="javascript:;">'+ option.cancelBtn +'</a>');
+                    $btngroup.delegate('.cancel-btn','click',function(){
+                        if(option.cancelCallback){
+                            option.cancelCallback();
+                        }else{
+                            dialog.closeAlert();
+                        }
+                    });
+
+                }
+                if(option.textBtn){
+                    $btngroup.append('<a class="text-btn" style="'+styleVal+'" href="javascript:;">'+ option.textBtn +'</a>');
+                    $btngroup.delegate('.text-btn','click',function(){
+                        dialog.closeAlert();
+                    });
+                }
+                $mask.css({'z-index':option.zindex-1});
+                $maskmes.css({'z-index':option.zindex-1});
+                $container.css({'z-index':option.zindex,'left':'50%','top':'50%','margin-left':-($container.width())/2+'px', 'margin-top': -($container.height())/2+'px'});
+                $containerMes.css({'z-index':option.zindex,'left':'50%','top':'50%','margin-left':-($containerMes.width())/2+'px', 'margin-top': -($containerMes.height())/2+'px'});
+                $contents.css({'text-align':option.TextAlign});
+
+            };
+
+            //隐藏弹窗
+            dialog.alertHide = function(){
+                if(option.closeCallback){
+                    option.closeCallback();
+                }
+                $container.hide().remove();
+                $mask.hide().remove();
+
+            };
+
+            //关闭弹窗
+            dialog.closeAlert = function(){
+                dialog.alertHide();
+            };
+
+            dialog.closeSetTimeOut = function(){
+                setTimeout(function(){
+                    $containerMes.stop().fadeOut(function(){
+                        $containerMes.remove();
+                    });
+                    $maskmes.stop().fadeOut(function(){
+                        $maskmes.remove();
+                    });
+                },3000);
+            };
+
+            //绑定点击事件
+            $closeBtn.on('click',dialog.closeAlert);
+
+            dialog.init();
+
+            return dialog;
+        },
+
+        /**
+         * 获取首投JD资格卡的浮标
+         * @param type:1 首页京东E卡 1：默认显示京东E卡浮层
+         * @param callback 京东E卡弹窗交互 jdFn(1)
+         */
+        showJDCardDialog : function (type,callback,tdDetailHtmlOpt) {
+            if (typeof tdDetailHtmlOpt !=='undefined' && typeof tdDetailHtmlOpt.investing !== 'undefined' && !tdDetailHtmlOpt.investing) return;
+            $.common.asyncPost('/home/showJDCardDialog', function (json) {
+                if (!json || json.length==0){
+                    $("#jd-dialog").hide();
+                }else {
+                    var html='';
+                    for (var i = 0; i < json.length; i++) {
+                        var item = json[i];
+                        html += "<tr> <td width=\"120\">￥"+item.prizeValue+"元</td>"+
+                            "<td>"+item.descriptionStr +"</td>"+
+                            "<td>"+item.useBeginDateStr+"至"+item.expirationDateStr+"</td></tr>"
+                    }
+                    $("#jd-text").html(html);
+                    if(type===1){
+                        $("#jd-dialog").show();   //首页默认显示京东E卡浮层
+                    }
+                    $('.scroll-div').slimscroll(); //美化滚动条
+                    callback && callback(1);       //显示京东E卡弹窗动画
+                }
+
+            }, function (err) {
+                $("#jd-dialog").hide();
+            });
+
+        },
+        /**
+         * 显示京东E卡弹窗动画
+         * @param onOff  显示弹窗开关 1：打开
+         * */
+        jdFn : function (onOff) {
+            var browserV = Math.floor($.browser.version);
+            //关闭右边图片
+            if (onOff) {
+                $(".jd-win").addClass("jd-win5").css({
+                    'margin-bottom':-parseInt(($(".jd-win").height()+ parseInt($(".jd-win").css('padding-bottom')))/2)+'px'
+                }).show();
+                $('#diallayer').show().css({
+                    "z-index": "999"
+                });
+            }
+
+            $('.right-banner-jd').find('.close').click(function () {
+                $('.right-banner-jd').hide();
+            });
+            //打开，关闭窗口
+            $('.right-banner-jd').find('a').click(function () {
+                if ($.browser.msie && browserV < 10) {
+                    $(".jd-win").css({
+                        "margin-left": "-324px",
+                        "margin-bottom": "-200px",
+                        "bottom": "50%",
+                        "left": "50%"
+                    })
+                } else {
+                    $('.jd-win').removeClass('jd-win4');
+                    $('.jd-win').addClass('jd-win3');
+                }
+                $('.jd-win').show().css({
+                    "z-index": "1001"
+                });
+                $('#diallayer').show().css({
+                    "z-index": "999"
+                });
+                return false;
+            });
+            $('.jd-win-close, .jd-btn').click(function () {
+                $(".right-banner-jd").addClass("jd-win6").show();
+                $('.jd-win').removeClass('jd-win5').attr('style','');
+                $('.jd-win').removeClass('jd-win3');
+                $('.jd-win').addClass('jd-win4');
+                if ($.browser.msie && browserV < 10) {
+                    $('.jd-win').hide();
+
+                } else {
+                    setTimeout(function () {
+                        $('.jd-win').hide();
+                    }, 600);
+                }
+                $('#diallayer').hide().css({
+                    "z-index": "101"
+                });
+            })
+
+        },
+        autoInvestHtml: function (){
+            var autoHtml='';
+            autoHtml += '<div class=""><p class="text-333 fz16">扫描下载团贷网APP，开启自动投标可获得更高加息哦！</p>';
+            autoHtml += '<p style="margin-top: 40px;"><img src="//js4.tuandai.com/images/v2/open-zx-code.png?v=2018101801" alt=""></p>';
+            autoHtml += '<p class="tdw-icons zx-bg-line">开启方式</p>';
+            autoHtml += '<div class="text-333">打开团贷网APP<span class="tdw-icons i-arrow-zx"></span>“我”的页面<span class="tdw-icons i-arrow-zx"></span>自动投标<span class="tdw-icons i-arrow-zx"></span>添加策略 </div></div>';
+            return autoHtml;
+        },
+        //开启自动投资弹窗
+        openAutoInvestAlt :function(){
+            var autoHtml= this.autoInvestHtml();
+            publicUi.tdPopAlert({
+                className:'open-zx-alert',
+                id:'openZxPopAlert',
+                type:'dialog',
+                title:'开启自动投标',
+                contents:autoHtml,
+                TextAlign:'center',
+                width:480,
+                height:400,
+                zindex:9999
+            });
+        }
+    }
+
+})(window, jQuery);
+
+$(function () {
+    publicUi.showRightSlider(); //显示右侧工具栏
+    publicUi.postLoan('.daihou-list-new'); //贷后追踪显示效果
+    publicUi.subMenuShow(); //未登录 隐藏我的账户下拉菜单
+    publicUi.showtips(); // 年化利率风险提示
+    publicUi.showCodexe(); //身份证示例图显示
+});
+
+
+
+ 
+

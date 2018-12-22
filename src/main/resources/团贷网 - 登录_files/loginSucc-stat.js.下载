@@ -1,0 +1,26 @@
+/**
+ * Created by Yips on 2017/12/25.
+ */
+
+var loginSuccssStat = function(){
+
+    var _url = 'passport.tuandai.com/2login';
+    if (document.URL.indexOf("tdw.cn")!=-1){
+        _url = 'passport.tdw.cn/2login';
+    }
+
+    var _platformType = "PC";
+    if ((navigator.userAgent.match(/(iPhone|iPod|Android|ios|iPad|Windows\sPhone)/i))){
+        _platformType = "WAP"
+    }
+
+    try{
+        sa.track('LoginSuccess', {
+            PlatformType: _platformType,
+            PlatformName:'团贷网' ,
+            Url:_url
+        });
+    }catch(err) {
+    }
+
+}
